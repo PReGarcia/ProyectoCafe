@@ -1,0 +1,12 @@
+Hay que cambiar la clase slot solo tiene que ser una clase que recibe mensajes los meta a una lista y al ser leido lo borre ✅
+Hay que cambiar las clases de puertos.          Entrada: una funcion que reciba un string que sea un nombre de archivo, lo parsea a document (Hay una funcion que lo hace en xmlutils) ,lo convierte en mensaje y lo pasa al slot. ✅
+                                                Puerto salida: Coge el cuerpo del mensaje lo convierte a un documento xml y lo devuelve en una ruta. ✅
+Hay que mandar al splitter la expresion xpath desde su configuracion *(Se ha intentado pero no sabemos si está bien)*
+El translator funciona con xlst que se le pasa al configurarlo ✅
+El distributor recibe n expresiones xpath, una por salida, y las evalua 1 a 1 para decidir si los envia por esa salida ✅
+Singleton es un patron de diseño
+En el splitter se hace una copia de cada nodo nuevo que sera el cuerpo del mensaje, al original se le eliminan los nodos y de ahi queda el Singleton
+el aggregator tiene que recibir la expresion xpath donde colgar los elementos
+El singleton tiene un mapa que se lee o se escribe con todos los arboles de las comandas
+El content enricher recibe una expresion xpath donde colgar los nodos
+El merger no esta implementado
