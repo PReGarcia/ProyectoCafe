@@ -64,4 +64,10 @@ public class XmlUtils {
         return resultList;
     }
 
+    public static Document createNewDocument() throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.newDocument();
+    }
+
 }

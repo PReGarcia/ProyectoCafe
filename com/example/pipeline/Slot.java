@@ -8,16 +8,20 @@ public class Slot {
 
     private List<Message> mensajes = new LinkedList<>();
 
-    public void recibirMensaje(Message mensaje) {
+    public void enviarMensaje(Message mensaje) {
         if (mensaje != null) {
             mensajes.add(mensaje);
         }
     }
 
-    public Message leerMensaje() {
+    public Message recibirMensaje() {
         if (mensajes.isEmpty()) {
             return null;
         }
         return mensajes.remove(0);
+    }
+
+    public boolean esVacia() {
+        return mensajes.isEmpty();
     }
 }

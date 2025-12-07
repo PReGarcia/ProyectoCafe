@@ -9,11 +9,18 @@ public class Message {
     private int ordenSecuencia;
     private Document cuerpo;
 
-    public Message(String cid, String corrid, int tam, int orden, Document c){
+    public Message(String cid, String corrId, int tamSec, int ordSec, Document c){
         comandaId = cid;
-        correlationId = corrid;
-        tamSecuencia = tam;
-        ordenSecuencia = orden;
+        correlationId = corrId;
+        tamSecuencia = tamSec;
+        ordenSecuencia = ordSec;
+        cuerpo = c;
+    }
+
+    public Message(String cid, Document c){
+        comandaId = cid;
+        tamSecuencia = 0;
+        ordenSecuencia = 0;
         cuerpo = c;
     }
 

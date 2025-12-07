@@ -1,64 +1,65 @@
 package tareas;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import pipeline.Slot;
 import utils.Message;
 
 //Hay que hacerlo mas generico esta hecho muy pensado para cafe??
 public class Correlator implements Task {
 
-    private final Map<String, Message> pendingMessages = new ConcurrentHashMap<>();
+    private final Map<String, Message> pendientes = new ConcurrentHashMap<>();
+    private final Map<String, Message> respuestas = new ConcurrentHashMap<>();
+    private final Slot[] entradas;
+    private final Map<String, Slot> solicitudes = new HashMap<>();
+    private final Slot[] salidas;
 
-    private String RESPONSE_ROLE_VALUE;
-    private String DATA_HEADER;
-    private String ROLE_HEADER;
-    private static final String CORRELATION_ID_HEADER = "correlationId";
-
-    public Correlator(){}
-
-    public Correlator(String roleString, String dataString, String responseString){
-        this.DATA_HEADER = dataString;
-        this.RESPONSE_ROLE_VALUE = responseString;
-        this.ROLE_HEADER = roleString;
+    public Correlator(Slot[] entradas, Slot... salidas){
+        this.entradas = entradas;
+        solicitudes.put("Pendientes", entradas[0]);
+        solicitudes.put("Respuestas", entradas[1]);
+        this.salidas = salidas;
     }
 
     @Override
-    public List<Message> execute(Message inputMessage) throws Exception {
-
-        String correlationId = (String) inputMessage.getHeader(CORRELATION_ID_HEADER);
-
-        if (correlationId == null) {
-            System.out.println("ERROR: Mensaje llego al Correlator sin '" + CORRELATION_ID_HEADER + "'. Descartando.");
-            return null; 
-        }
-
-        Message pendingMessage = pendingMessages.remove(correlationId);
-
-        if (pendingMessage == null) {
-            pendingMessages.put(correlationId, inputMessage);
-            
-            return null; 
-        
-        } else {
-
-            Message originalMessage;
-            Message responseMessage;
-
-            if (RESPONSE_ROLE_VALUE.equals(inputMessage.getHeader(ROLE_HEADER))) {
-                responseMessage = inputMessage;
-                originalMessage = pendingMessage;
-            } else {
-                originalMessage = inputMessage;
-                responseMessage = pendingMessage;
+    public void execute() throws Exception {
+        while(!entradas[0].esVacia() || !entradas[1].esVacia()) {
+            for(Map.Entry<String, Slot> entrada : solicitudes.entrySet()) {
+                String tipo = entrada.getKey();
+                Slot slot = entrada.getValue();
+                if(!slot.esVacia()) {
+                    Message mensaje = slot.recibirMensaje();
+                    if(tipo.equals("Pendientes")) {
+                        correlate(mensaje, false);
+                    } else {
+                        correlate(mensaje, true);
+                    }
+                }
             }
+        }
+    }
 
-            Object responseData = responseMessage.getPayload();
-            originalMessage.setHeader(DATA_HEADER, responseData); //
-
-            return Collections.singletonList(originalMessage);
+    public void correlate(Message inputMessage, boolean respuesta) throws Exception {
+        String corrId = inputMessage.getCorrelationId();
+        if(respuesta){
+            if(pendientes.containsKey(corrId)){
+                Message mensaje = pendientes.remove(corrId);
+                salidas[0].enviarMensaje(mensaje);
+                salidas[1].enviarMensaje(inputMessage);
+            }else{
+                respuestas.put(inputMessage.getCorrelationId(), inputMessage);
+            }
+        }
+        else{
+            if(respuestas.containsKey(corrId)){
+                Message mensaje = respuestas.remove(corrId);
+                salidas[0].enviarMensaje(inputMessage);
+                salidas[1].enviarMensaje(mensaje);
+            }else{
+                pendientes.put(inputMessage.getCorrelationId(), inputMessage);
+            }
         }
     }
 }

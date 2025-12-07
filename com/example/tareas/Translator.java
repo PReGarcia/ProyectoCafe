@@ -1,8 +1,6 @@
 package tareas;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -11,26 +9,33 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+
+import pipeline.Slot;
 import utils.Message;
 
 public class Translator implements Task {
 
     private String rutaXslt;
+    private Slot entrada;
+    private Slot salida;
 
-    public Translator(String rutaXslt) {
+    public Translator(String rutaXslt, Slot entrada, Slot salida) {
         this.rutaXslt = rutaXslt;
+        this.entrada = entrada;
+        this.salida = salida;
     }
 
     @Override
-    public List<Message> execute(Message mensajeEntrada) throws Exception {
+    public void execute() throws Exception {     
+        while(!entrada.esVacia()) {
+            translate(entrada.recibirMensaje());
+        }
+    }
+
+    public void translate(Message mensajeEntrada) throws Exception {
         System.out.println("Ejecutando Translator (Aplicando XSLT: " + rutaXslt + ")...");
 
         Document xmlOriginal = mensajeEntrada.getCuerpo();
-
-        if (xmlOriginal == null) {
-            System.err.println("Translator: El mensaje no tiene cuerpo XML.");
-            return Collections.singletonList(mensajeEntrada);
-        }
 
         File archivoXslt = new File(rutaXslt);
         TransformerFactory fabrica = TransformerFactory.newInstance();
@@ -45,7 +50,6 @@ public class Translator implements Task {
 
         Message mensajeSalida = mensajeEntrada.clonar();
         mensajeSalida.setCuerpo(xmlTransformado);
-
-        return Collections.singletonList(mensajeSalida);
+        salida.enviarMensaje(mensajeSalida);
     }
 }

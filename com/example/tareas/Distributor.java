@@ -1,6 +1,5 @@
 package tareas;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,26 +14,24 @@ import utils.XmlUtils;
 public class Distributor implements Task {
 
     private Map<String, Slot> salidas;
+    private Slot entrada;
 
-    public Distributor() {
-        this.salidas = new LinkedHashMap<>();
-    }
-
-    public void agregarSalida(String xpath, Slot slotDestino) {
-        if (xpath != null && slotDestino != null) {
-            salidas.put(xpath, slotDestino);
+    public Distributor(List<String> xpath, Slot entrada,List<Slot> salidas) {
+        this.salidas =  new LinkedHashMap<>();
+        this.entrada = entrada;
+        for (int i = 0; i < xpath.size(); i++) {
+            this.salidas.put(xpath.get(i), salidas.get(i));
         }
     }
 
     @Override
-    public List<Message> execute(Message mensajeEntrada) throws Exception {
-        System.out.println("Ejecutando Distributor...");
-
-        Document documento = mensajeEntrada.getCuerpo();
-
-        if (documento == null) {
-            return Collections.emptyList();
+    public void execute() throws Exception {
+        while(!entrada.esVacia()) {
+            distribute(entrada.recibirMensaje());
         }
+    }
+    public void distribute(Message mensajeEntrada) throws Exception {
+        Document documento = mensajeEntrada.getCuerpo();
 
         for (Map.Entry<String, Slot> regla : salidas.entrySet()) {
             String xpath = regla.getKey();
@@ -43,13 +40,10 @@ public class Distributor implements Task {
             Node resultado = XmlUtils.NodeSearch(documento, xpath);
 
             if (resultado != null) {
-                System.out.println(" -> Condición cumplida (" + xpath + "). Enviando al slot correspondiente.");
-                
                 Message copia = mensajeEntrada.clonar();
-                slotDestino.recibirMensaje(copia);
+                copia.setCuerpo((Document) resultado);
+                slotDestino.enviarMensaje(copia);
             }
         }
-
-        return Collections.emptyList();
     }
 }

@@ -1,18 +1,28 @@
 package tareas;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import pipeline.Slot;
 import utils.Message;
 
 public class Replicator implements Task {
+    private Slot[] salidas;
+    private Slot entrada;
+
+    public Replicator(Slot entrada, Slot... salidas) {
+        this.entrada = entrada;
+        this.salidas = salidas;
+    }
 
     @Override
-    public List<Message> execute(Message inputMessage) {
-        List<Message> copies = new ArrayList<>();
-        copies.add(inputMessage.cloneMessage());
-        copies.add(inputMessage.cloneMessage());
-        
-        return copies;
+    public void execute() {
+        while (!entrada.esVacia()) {
+            replicate(entrada.recibirMensaje());
+        }
+    }
+
+    public void replicate(Message mensaje) {
+        for (Slot salida : salidas) {
+            Message nuevoMensaje = mensaje.clonar();
+            salida.enviarMensaje(nuevoMensaje);
+        }
     }
 }

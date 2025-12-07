@@ -16,7 +16,7 @@ public class Aggregator implements Task {
     private static final String AGGREGATE_SIZE_HEADER = "splitSize";
 
     @Override
-    public List<Message> execute(Message inputMessage) throws Exception {
+    public void execute() throws Exception {
         String comandaId = (String) inputMessage.getHeader(AGGREGATE_ID_HEADER);
         Integer comandaSize = (Integer) inputMessage.getHeader(AGGREGATE_SIZE_HEADER);
 
@@ -38,7 +38,6 @@ public class Aggregator implements Task {
                 completedMessage = buildAggregatedMessage(new ArrayList<>(comandaList));
             }
         }
-        return completedMessage;
     }
 
     private List<Message> buildAggregatedMessage(List<Message> messages) {
