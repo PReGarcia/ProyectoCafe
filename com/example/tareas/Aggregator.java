@@ -1,56 +1,72 @@
 package tareas;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import pipeline.Slot;
+import utils.Arbol;
 import utils.Message;
+import utils.XmlUtils;
 
 public class Aggregator implements Task {
 
-    private final Map<String, List<Message>> pendingComandas = new ConcurrentHashMap<>();
-    private static final String AGGREGATE_ID_HEADER = "comandaId";
-    private static final String AGGREGATE_SIZE_HEADER = "splitSize";
+    private final Map<String, List<Message>> comandasPendientes = new ConcurrentHashMap<>();
+    private Slot entrada;
+    private Slot salida;
+    private String xpath;
+    Arbol arbol = Arbol.getInstancia();
+
+    public Aggregator(String xpath,Slot entrada, Slot salida) {
+        this.entrada = entrada;
+        this.salida = salida;
+    }
+
 
     @Override
     public void execute() throws Exception {
-        String comandaId = (String) inputMessage.getHeader(AGGREGATE_ID_HEADER);
-        Integer comandaSize = (Integer) inputMessage.getHeader(AGGREGATE_SIZE_HEADER);
+        while(!entrada.esVacia()) {
+            Message mensaje = entrada.recibirMensaje();
+            String idComanda = mensaje.getComandaId();
 
-        if (comandaId == null || comandaSize == null) return null;
 
-        List<Message> comandaList = pendingComandas.computeIfAbsent(comandaId, k -> new ArrayList<>());
-        List<Message> completedMessage = null;
+            List<Message> lista = comandasPendientes.computeIfAbsent(idComanda, k -> new ArrayList<>());
+            lista.add(mensaje);
 
-        synchronized (comandaList) {
-            comandaList.add(inputMessage);
-            int itemsRecibidos = comandaList.size();
-
-            System.out.println("   (Aggregator) Recibido plato " + itemsRecibidos + " de " + comandaSize + " para la mesa.");
-
-            if (itemsRecibidos == comandaSize) {
-                System.out.println("\n   >> ORDEN COMPLETADA (" + comandaId + "). Enviando todo al Camarero.\n");
-                
-                pendingComandas.remove(comandaId);
-                completedMessage = buildAggregatedMessage(new ArrayList<>(comandaList));
+            if(mensaje.getTamSecuencia() == lista.size()) {
+                lista.sort(Comparator.comparingInt(Message::getOrdenSecuencia));
+                aggregate(mensaje.getComandaId(),lista);
+                comandasPendientes.remove(idComanda);
             }
         }
     }
 
-    private List<Message> buildAggregatedMessage(List<Message> messages) {
-        List<Object> aggregatedPayloads = messages.stream()
-                .map(Message::getPayload)
-                .collect(Collectors.toList());
+    private void aggregate(String idComanda,List<Message> messages) throws Exception {
+        Document comanda = arbol.getArbol(idComanda); 
 
-        Message finalMessage = new Message(aggregatedPayloads);
-        Message firstMessage = messages.get(0);
-        finalMessage.setHeader(AGGREGATE_ID_HEADER, firstMessage.getHeader(AGGREGATE_ID_HEADER));
-        finalMessage.setHeader(AGGREGATE_SIZE_HEADER, firstMessage.getHeader(AGGREGATE_SIZE_HEADER));
-        finalMessage.setHeader("status", "COMPLETADA");
+        Document doc = XmlUtils.createNewDocument();
+        Node root = doc.importNode(comanda, true);
+        doc.appendChild(root);
 
-        return Collections.singletonList(finalMessage);
+        Node nodoDestino = XmlUtils.NodeSearch(comanda, xpath);
+        Document documentoNodos;
+
+        Message mensajeSalida = null;
+        for (Message msg : messages) {
+            if(mensajeSalida == null) {
+                mensajeSalida = msg.clonar();
+            }
+            documentoNodos = XmlUtils.createNewDocument();
+            Node bebidaNode = documentoNodos.importNode(msg.getCuerpo(),true);
+            nodoDestino.appendChild(bebidaNode);
+        }
+
+        mensajeSalida.setCuerpo(doc);
+        salida.enviarMensaje(mensajeSalida);
     }
 }

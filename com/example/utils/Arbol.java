@@ -9,7 +9,7 @@ import org.w3c.dom.Node;
 
 public class Arbol {
     private static Arbol instancia;
-    private Map<String, Object> arbolesMap;
+    private Map<String, Document> arbolesMap;
 
     private Arbol() {
         arbolesMap = new HashMap<>();
@@ -31,5 +31,9 @@ public class Arbol {
             instancia = new Arbol();
         }
         return instancia;
+    }
+
+    public Document getArbol(String clave) {
+        return arbolesMap.remove(clave);
     }
 }

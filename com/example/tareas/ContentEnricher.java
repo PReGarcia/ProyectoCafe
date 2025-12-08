@@ -1,36 +1,34 @@
 package tareas;
 
-import java.util.Collections;
-import java.util.List;
+import org.w3c.dom.Node;
 
+import pipeline.Slot;
 import utils.Message;
+import utils.XmlUtils;
 
 public class ContentEnricher implements Task {
 
-    private static final String CORRELATOR_DATA_HEADER = "datosBarman";
-    
-    private static final String ENRICHMENT_HEADER = "infoBebida";
+    private String xpath;
+    private Slot[] entradas;
+    private Slot salida;
+
+    public ContentEnricher(String xpath, Slot salida, Slot... entradas) {
+        this.xpath = xpath;
+        this.entradas = entradas;
+        this.salida = salida;
+    }
 
     @Override
-    public List<Message> execute(Message inputMessage) throws Exception {
-        System.out.println("Ejecutando tarea de tipo ContentEnricher (Logica Cafe Sol)");
-
-        Message outputMessage = inputMessage.cloneMessage();
-
-        Object datosExternos = outputMessage.getHeader(CORRELATOR_DATA_HEADER);
-
-        if (datosExternos != null) {
-            outputMessage.setHeader(ENRICHMENT_HEADER, datosExternos);
-            
-
-            System.out.println("Mensaje enriquecido con '" + ENRICHMENT_HEADER + "': " + datosExternos);
-            
-
-        } else {
-            System.out.println("ContentEnricher: No se encontraron datos en el header '" + CORRELATOR_DATA_HEADER + "'."
-                               + " El Correlator (5 o 9) no adjunto la informacion.");
-            outputMessage.setHeader(ENRICHMENT_HEADER, "DATOS_NO_ENCONTRADOS");
+    public void execute() throws Exception {
+        while(!entradas[0].esVacia() || !entradas[1].esVacia()){
+            enriquecer(entradas[0].recibirMensaje(), entradas[1].recibirMensaje());
         }
-        return Collections.singletonList(outputMessage);
+    }
+
+    private void enriquecer(Message mensaje, Message respuesta) throws Exception {
+        Node nodoDestino = XmlUtils.NodeSearch(mensaje.getCuerpo(), xpath);
+        Node nodoImportado = mensaje.getCuerpo().importNode(respuesta.getCuerpo(), true);
+        nodoDestino.appendChild(nodoImportado);
+        salida.enviarMensaje(mensaje);
     }
 }
