@@ -27,7 +27,7 @@ public class Translator implements Task {
 
     @Override
     public void execute() throws Exception {     
-        while(!entrada.esVacia()) {
+        while(!entrada.esVacia()){
             translate(entrada.recibirMensaje());
         }
     }
