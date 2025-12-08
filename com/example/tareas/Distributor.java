@@ -26,10 +26,9 @@ public class Distributor implements Task {
 
     @Override
     public void execute() throws Exception {
-        while(!entrada.esVacia()) {
-            distribute(entrada.recibirMensaje());
-        }
+        distribute(entrada.recibirMensaje());
     }
+
     public void distribute(Message mensajeEntrada) throws Exception {
         Document documento = mensajeEntrada.getCuerpo();
 

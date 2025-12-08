@@ -13,13 +13,11 @@ public class Replicator implements Task {
     }
 
     @Override
-    public void execute() {
-        while (!entrada.esVacia()) {
-            replicate(entrada.recibirMensaje());
-        }
+    public void execute() throws Exception {
+        replicate(entrada.recibirMensaje());
     }
 
-    public void replicate(Message mensaje) {
+    public void replicate(Message mensaje) throws Exception {
         for (Slot salida : salidas) {
             Message nuevoMensaje = mensaje.clonar();
             salida.enviarMensaje(nuevoMensaje);

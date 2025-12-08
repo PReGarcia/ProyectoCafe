@@ -27,13 +27,10 @@ public class Translator implements Task {
 
     @Override
     public void execute() throws Exception {     
-        while(!entrada.esVacia()){
-            translate(entrada.recibirMensaje());
-        }
+        translate(entrada.recibirMensaje());
     }
 
     public void translate(Message mensajeEntrada) throws Exception {
-        System.out.println("Ejecutando Translator (Aplicando XSLT: " + rutaXslt + ")...");
 
         Document xmlOriginal = mensajeEntrada.getCuerpo();
 

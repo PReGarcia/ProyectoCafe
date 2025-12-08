@@ -25,7 +25,7 @@ public class Correlator implements Task {
 
     @Override
     public void execute() throws Exception {
-        while(!entradas[0].esVacia() || !entradas[1].esVacia()) {
+        if(!entradas[0].esVacia() && !entradas[1].esVacia()) {
             for(Map.Entry<String, Slot> entrada : solicitudes.entrySet()) {
                 String tipo = entrada.getKey();
                 Slot slot = entrada.getValue();

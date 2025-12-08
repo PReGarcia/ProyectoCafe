@@ -20,9 +20,7 @@ public class ContentEnricher implements Task {
 
     @Override
     public void execute() throws Exception {
-        while(!entradas[0].esVacia() || !entradas[1].esVacia()){
-            enriquecer(entradas[0].recibirMensaje(), entradas[1].recibirMensaje());
-        }
+        enriquecer(entradas[0].recibirMensaje(), entradas[1].recibirMensaje());
     }
 
     private void enriquecer(Message mensaje, Message respuesta) throws Exception {

@@ -44,9 +44,7 @@ public class Splitter implements Task {
 
     @Override
     public void execute() throws Exception {
-        while(!entrada.esVacia()){
-            split(entrada.recibirMensaje());
-        }
+        split(entrada.recibirMensaje());
     }
     
     public void split(Message mensaje) throws Exception {
