@@ -17,7 +17,7 @@ public class OutputPort {
     }
 
     public void escribirArchivo(String rutaDestino) {
-        Message mensaje = slot.leerMensaje();
+        Message mensaje = slot.recibirMensaje();
 
         if (mensaje == null) {
             System.out.println("OutputPort: No hay mensajes en el slot para escribir.");
@@ -43,7 +43,7 @@ public class OutputPort {
                 e.printStackTrace();
             }
         } else {
-            System.err.println("OutputPort: El mensaje recibido no tiene cuerpo (Document es null).");
+            System.err.println("OutputPort: El mensaje recibido no tiene cuerpo.");
         }
     }
 }

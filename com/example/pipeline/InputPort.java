@@ -18,9 +18,14 @@ public class InputPort {
         if (documento != null) {
             Message mensaje = new Message(null, null, 0, 0, documento);
             
-            slot.recibirMensaje(mensaje);
+            try {
+                slot.enviarMensaje(mensaje);
+                System.out.println("InputPort: Archivo '" + nombreArchivo + "' leído y enviado al Slot.");
+            } catch (Exception e) {
+                System.err.println("InputPort: Error al enviar el mensaje al slot.");
+                e.printStackTrace();
+            }
             
-            System.out.println("InputPort: Archivo '" + nombreArchivo + "' leído y enviado al Slot.");
         } else {
             System.err.println("InputPort: Error al leer el archivo " + nombreArchivo);
         }
