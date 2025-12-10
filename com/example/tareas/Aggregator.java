@@ -23,6 +23,7 @@ public class Aggregator implements Task {
     Arbol arbol = Arbol.getInstancia();
 
     public Aggregator(String xpath,Slot entrada, Slot salida) {
+        this.xpath = xpath;
         this.entrada = entrada;
         this.salida = salida;
     }
@@ -50,19 +51,17 @@ public class Aggregator implements Task {
         Document comanda = arbol.getArbol(idComanda); 
 
         Document doc = XmlUtils.createNewDocument();
-        Node root = doc.importNode(comanda, true);
+        Node root = doc.importNode(comanda.getDocumentElement(), true);
         doc.appendChild(root);
 
-        Node nodoDestino = XmlUtils.NodeSearch(comanda, xpath);
-        Document documentoNodos;
+        Node nodoDestino = XmlUtils.NodeSearch(doc, xpath);
 
         Message mensajeSalida = null;
         for (Message msg : messages) {
             if(mensajeSalida == null) {
                 mensajeSalida = msg.clonar();
             }
-            documentoNodos = XmlUtils.createNewDocument();
-            Node bebidaNode = documentoNodos.importNode(msg.getCuerpo(),true);
+            Node bebidaNode = doc.importNode(msg.getCuerpo().getDocumentElement(),true);
             nodoDestino.appendChild(bebidaNode);
         }
 

@@ -19,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        String xlst = "com/example/conexiones/xlst.xml";
+        String xlst = "com/example/utils/xlst.xml";
         List<String> xpathdist = List.of(
             "/drink[type='hot']",
             "/drink[type='cold']"
@@ -92,7 +92,7 @@ public class Main {
         Task mergerTask = mergerFactory.createTask(new Slot[]{slotEnricherMerger1, slotEnricherMerger2}, slotMergerAdd);
         Task aggregatorTask = aggregatorFactory.createTask("/cafe_order/drinks", slotMergerAdd, slotAddOut);
 
-        inputPort.leerArchivo(Path.of("com/example/comandas/order1.xml").toAbsolutePath().toString());
+        inputPort.leerArchivo(Path.of("com/comandas/order1.xml").toAbsolutePath().toString());
         splitTask.execute();
         distTask.execute();
         repHotTask.execute();
@@ -107,6 +107,6 @@ public class Main {
         enricherTask2.execute();
         mergerTask.execute();
         aggregatorTask.execute();
-        outputPort.escribirArchivo("output");
+        outputPort.escribirArchivo("com/output/order.xml");
     } 
 }
