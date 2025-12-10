@@ -1,14 +1,21 @@
 package pipeline;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
+
 import org.w3c.dom.Document;
+
 import utils.Message;
 import utils.XmlUtils;
 
 public class InputPort {
 
+    private final Path watchDir;
     private Slot slot;
 
-    public InputPort(Slot slot) {
+    public InputPort(Path watchDir,Slot slot) {
+        this.watchDir = watchDir;
         this.slot = slot;
     }
 
@@ -28,6 +35,33 @@ public class InputPort {
             
         } else {
             System.err.println("InputPort: Error al leer el archivo " + nombreArchivo);
+        }
+    }
+
+    public void start() {
+        new Thread(this::pollLoop, "ComandasPoll-Thread").start();
+        System.out.println("   [ComandasPoll] Iniciado para leer en: " + watchDir.toAbsolutePath());
+    }
+
+    private void pollLoop() {
+        while (true) {
+            try {
+                Files.list(watchDir.toAbsolutePath())
+                     .filter(Files::isRegularFile)
+                     .forEach(this::processFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try { TimeUnit.MILLISECONDS.sleep(500); } catch (InterruptedException ignored) {}
+        }
+    }
+    
+    private void processFile(Path file) {
+        try {
+            leerArchivo(file.toString());
+        } catch (Exception e) {
+            System.err.println("Error procesando " + file);
         }
     }
 }

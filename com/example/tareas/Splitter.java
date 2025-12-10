@@ -1,18 +1,14 @@
 package tareas;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import pipeline.Slot;
-import utils.Message;
 import utils.Arbol;
+import utils.Message;
 import utils.XmlUtils;
 
 public class Splitter implements Task {
