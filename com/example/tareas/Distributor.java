@@ -26,12 +26,9 @@ public class Distributor implements Task {
 
     @Override
     public void execute() throws Exception {
-        int contador = 0;
         while(!entrada.esVacia()) {
             distribute(entrada.recibirMensaje());
-            contador++;
         }
-        System.out.println("Distributor: No hay más mensajes en la entrada. Tarea finalizada." + contador + " mensajes procesados.");
     }
     public void distribute(Message mensajeEntrada) throws Exception {
         Document documento = mensajeEntrada.getCuerpo();
@@ -44,7 +41,6 @@ public class Distributor implements Task {
 
             if (resultado != null) {
                 Message copia = mensajeEntrada.clonar();
-                copia.setCuerpo((Document) resultado);
                 slotDestino.enviarMensaje(copia);
             }
         }

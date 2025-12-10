@@ -19,10 +19,10 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        String xlst = "";
+        String xlst = "com/example/conexiones/xlst.xml";
         List<String> xpathdist = List.of(
-            "/cafe_order/drinks/drink[@type='hot']",
-            "/cafe_order/drinks/drink[@type='cold']"
+            "/drink[type='hot']",
+            "/drink[type='cold']"
         );
 
         Slot slotDistRepHot = new Slot();
@@ -87,8 +87,8 @@ public class Main {
         Task corTask1 = correlatorFactory.createTask(new Slot[]{slotRepCor1, slotRequestCor1}, new Slot[]{slotCorEnricherPend1, slotCorEnricherRes1});
         Task tradTask2 = traductorFactory.createTask(xlst, slotRepTrad2, slotTradReq2);
         Task corTask2 = correlatorFactory.createTask(new Slot[]{slotRepCor2, slotRequestCor2}, new Slot[]{slotCorEnricherPend2, slotCorEnricherRes2});
-        Task enricherTask1 = contentEnricherFactory.createTask("/cafe_order/drinks/drink", slotEnricherMerger1, new Slot[]{slotCorEnricherPend1, slotCorEnricherRes1});
-        Task enricherTask2 = contentEnricherFactory.createTask("/cafe_order/drinks/drink", slotEnricherMerger2, new Slot[]{slotCorEnricherPend2, slotCorEnricherRes2});
+        Task enricherTask1 = contentEnricherFactory.createTask("/drink", slotEnricherMerger1, new Slot[]{slotCorEnricherPend1, slotCorEnricherRes1});
+        Task enricherTask2 = contentEnricherFactory.createTask("/drink", slotEnricherMerger2, new Slot[]{slotCorEnricherPend2, slotCorEnricherRes2});
         Task mergerTask = mergerFactory.createTask(new Slot[]{slotEnricherMerger1, slotEnricherMerger2}, slotMergerAdd);
         Task aggregatorTask = aggregatorFactory.createTask("/cafe_order/drinks", slotMergerAdd, slotAddOut);
 

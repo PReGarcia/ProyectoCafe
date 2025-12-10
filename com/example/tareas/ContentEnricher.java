@@ -30,7 +30,7 @@ public class ContentEnricher implements Task {
     private void enriquecer(Message mensaje, Message respuesta) throws Exception {
         counter++;
         Node nodoDestino = XmlUtils.NodeSearch(mensaje.getCuerpo(), xpath);
-        Node nodoImportado = mensaje.getCuerpo().importNode(respuesta.getCuerpo(), true);
+        Node nodoImportado = mensaje.getCuerpo().importNode(respuesta.getCuerpo().getDocumentElement(), true);
         nodoDestino.appendChild(nodoImportado);
         salida.enviarMensaje(mensaje);
         if (counter == 1) {

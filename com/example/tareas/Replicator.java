@@ -14,9 +14,12 @@ public class Replicator implements Task {
 
     @Override
     public void execute() {
+        int contador = 0;
         while (!entrada.esVacia()) {
             replicate(entrada.recibirMensaje());
+            contador++;
         }
+        System.out.println("Replicator: Tarea finalizada. " + contador + " mensajes replicados.");
     }
 
     public void replicate(Message mensaje) {
