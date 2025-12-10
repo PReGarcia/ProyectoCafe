@@ -8,6 +8,8 @@ import utils.XmlUtils;
 
 public class ContentEnricher implements Task {
 
+    private int counter = 0;
+
     private String xpath;
     private Slot[] entradas;
     private Slot salida;
@@ -26,9 +28,13 @@ public class ContentEnricher implements Task {
     }
 
     private void enriquecer(Message mensaje, Message respuesta) throws Exception {
+        counter++;
         Node nodoDestino = XmlUtils.NodeSearch(mensaje.getCuerpo(), xpath);
         Node nodoImportado = mensaje.getCuerpo().importNode(respuesta.getCuerpo(), true);
         nodoDestino.appendChild(nodoImportado);
         salida.enviarMensaje(mensaje);
+        if (counter == 1) {
+            System.out.println("ContentEnricher: Se han procesado " + counter + " mensajes.");
+        }
     }
 }

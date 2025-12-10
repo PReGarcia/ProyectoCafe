@@ -65,7 +65,7 @@ public class Main {
         Slot[] arrayRepHot = {slotRepCor1, slotRepTrad1};
         Slot[] arrayRepCold = {slotRepCor2, slotRepTrad2};
  
-        InputPort inputPort = new InputPort(Path.of("/com/example/comandas"),slotInSplit);
+        InputPort inputPort = new InputPort(slotInSplit);
         OutputPort outputPort = new OutputPort(slotAddOut);
         RequestPort requestPort1 = new RequestPort(slotTradReq1, slotRequestCor1);
         RequestPort requestPort2 = new RequestPort(slotTradReq2, slotRequestCor2);
@@ -92,7 +92,7 @@ public class Main {
         Task mergerTask = mergerFactory.createTask(new Slot[]{slotEnricherMerger1, slotEnricherMerger2}, slotMergerAdd);
         Task aggregatorTask = aggregatorFactory.createTask("/cafe_order/drinks", slotMergerAdd, slotAddOut);
 
-        inputPort.start();
+        inputPort.leerArchivo(Path.of("com/example/comandas/order1.xml").toAbsolutePath().toString());
         splitTask.execute();
         distTask.execute();
         repHotTask.execute();
