@@ -87,11 +87,12 @@ public class Main {
         Task corTask1 = correlatorFactory.createTask(new Slot[]{slotRepCor1, slotRequestCor1}, new Slot[]{slotCorEnricherPend1, slotCorEnricherRes1});
         Task tradTask2 = traductorFactory.createTask(xlst, slotRepTrad2, slotTradReq2);
         Task corTask2 = correlatorFactory.createTask(new Slot[]{slotRepCor2, slotRequestCor2}, new Slot[]{slotCorEnricherPend2, slotCorEnricherRes2});
-        Task enricherTask1 = contentEnricherFactory.createTask("/drink", slotEnricherMerger1, new Slot[]{slotCorEnricherPend1, slotCorEnricherRes1});
-        Task enricherTask2 = contentEnricherFactory.createTask("/drink", slotEnricherMerger2, new Slot[]{slotCorEnricherPend2, slotCorEnricherRes2});
+        Task enricherTask1 = contentEnricherFactory.createTask(new String [] {"/drink", ""}, slotEnricherMerger1, new Slot[]{slotCorEnricherPend1, slotCorEnricherRes1});
+        Task enricherTask2 = contentEnricherFactory.createTask(new String [] {"/drink", ""}, slotEnricherMerger2, new Slot[]{slotCorEnricherPend2, slotCorEnricherRes2});
         Task mergerTask = mergerFactory.createTask(new Slot[]{slotEnricherMerger1, slotEnricherMerger2}, slotMergerAdd);
         Task aggregatorTask = aggregatorFactory.createTask("/cafe_order/drinks", slotMergerAdd, slotAddOut);
 
+        System.out.println("Iniciando procesamiento de la orden...");
         inputPort.leerArchivo(Path.of("com/comandas/order1.xml").toAbsolutePath().toString());
         splitTask.execute();
         distTask.execute();
@@ -108,5 +109,6 @@ public class Main {
         mergerTask.execute();
         aggregatorTask.execute();
         outputPort.escribirArchivo("com/output/order.xml");
+        System.out.println("Procesamiento completado. Archivo de salida generado en com/output/order.xml");
     } 
 }

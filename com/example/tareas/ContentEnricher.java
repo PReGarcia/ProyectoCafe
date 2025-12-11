@@ -8,13 +8,11 @@ import utils.XmlUtils;
 
 public class ContentEnricher implements Task {
 
-    private int counter = 0;
-
-    private String xpath;
+    private String [] xpath;
     private Slot[] entradas;
     private Slot salida;
 
-    public ContentEnricher(String xpath, Slot salida, Slot... entradas) {
+    public ContentEnricher(String[] xpath, Slot salida, Slot... entradas) {
         this.xpath = xpath;
         this.entradas = entradas;
         this.salida = salida;
@@ -28,13 +26,9 @@ public class ContentEnricher implements Task {
     }
 
     private void enriquecer(Message mensaje, Message respuesta) throws Exception {
-        counter++;
-        Node nodoDestino = XmlUtils.NodeSearch(mensaje.getCuerpo(), xpath);
+        Node nodoDestino = XmlUtils.NodeSearch(mensaje.getCuerpo(), xpath[0]);
         Node nodoImportado = mensaje.getCuerpo().importNode(respuesta.getCuerpo().getDocumentElement(), true);
         nodoDestino.appendChild(nodoImportado);
         salida.enviarMensaje(mensaje);
-        if (counter == 1) {
-            System.out.println("ContentEnricher: Se han procesado " + counter + " mensajes.");
-        }
     }
 }

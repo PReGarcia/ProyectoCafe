@@ -21,11 +21,10 @@ public class InputPort {
         Document documento = XmlUtils.parseXml(nombreArchivo);
 
         if (documento != null) {
-            Message mensaje = new Message(null, null, 0, 0, documento);
+            Message mensaje = new Message(null,null, 0, 0, documento);
             
             try {
                 slot.enviarMensaje(mensaje);
-                System.out.println("InputPort: Archivo '" + nombreArchivo + "' leído y enviado al Slot.");
             } catch (Exception e) {
                 System.err.println("InputPort: Error al enviar el mensaje al slot.");
                 e.printStackTrace();

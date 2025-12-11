@@ -33,8 +33,6 @@ public class Translator implements Task {
     }
 
     public void translate(Message mensajeEntrada) throws Exception {
-        System.out.println("Ejecutando Translator (Aplicando XSLT: " + rutaXslt + ")...");
-
         Document xmlOriginal = mensajeEntrada.getCuerpo();
 
         File archivoXslt = new File(rutaXslt);

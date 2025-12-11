@@ -33,7 +33,9 @@ public class Aggregator implements Task {
     public void execute() throws Exception {
         while(!entrada.esVacia()) {
             Message mensaje = entrada.recibirMensaje();
-            String idComanda = mensaje.getComandaId();
+            String idComanda = mensaje.getSequenceId();
+            System.out.println("Aggregator: Recibido mensaje para comanda " + idComanda + " ("
+                    + mensaje.getOrdenSecuencia() + "/" + mensaje.getTamSecuencia() + ")");
 
 
             List<Message> lista = comandasPendientes.computeIfAbsent(idComanda, k -> new ArrayList<>());
@@ -41,7 +43,7 @@ public class Aggregator implements Task {
 
             if(mensaje.getTamSecuencia() == lista.size()) {
                 lista.sort(Comparator.comparingInt(Message::getOrdenSecuencia));
-                aggregate(mensaje.getComandaId(),lista);
+                aggregate(mensaje.getSequenceId(),lista);
                 comandasPendientes.remove(idComanda);
             }
         }

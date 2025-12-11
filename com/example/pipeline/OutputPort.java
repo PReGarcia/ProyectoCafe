@@ -19,11 +19,6 @@ public class OutputPort {
     public void escribirArchivo(String rutaDestino) {
         Message mensaje = slot.recibirMensaje();
 
-        if (mensaje == null) {
-            System.out.println("OutputPort: No hay mensajes en el slot para escribir.");
-            return;
-        }
-
         Document documento = mensaje.getCuerpo();
 
         if (documento != null) {

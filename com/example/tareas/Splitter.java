@@ -11,22 +11,19 @@ import utils.Arbol;
 import utils.Message;
 import utils.XmlUtils;
 
+//colgar correlator id en el nodo
 public class Splitter implements Task {
 
     private String expresionXpath;
-    private String idGrupo;
     private Slot entrada;
     private Slot salida;
     private static Arbol arbolInstancia;
-    private boolean esConGrupo = false;
 
     public Splitter(String expresionXpath, String idGrupo, Slot entrada, Slot salida) {
         this.expresionXpath = expresionXpath;
-        this.idGrupo = idGrupo;
         this.entrada = entrada;
         this.salida = salida;
         arbolInstancia = Arbol.getInstancia();
-        esConGrupo = true;
     }
 
     public Splitter(String expresionXpath, Slot entrada, Slot salida) {
@@ -47,22 +44,17 @@ public class Splitter implements Task {
     
     public void split(Message mensaje) throws Exception {
         Message recibido = mensaje;
-        Document comanda = mensaje.getCuerpo();
+        Document doc = mensaje.getCuerpo();
 
-        if(!esConGrupo){
-            recibido.setComandaId(UUID.randomUUID().toString());
-        }else{
-            recibido.setComandaId(XmlUtils.NodeSearch(comanda, idGrupo).getTextContent());
-        }
-
-        List<Node> items = XmlUtils.NodeGroupSearch(comanda, expresionXpath);
+        List<Node> items = XmlUtils.NodeGroupSearch(doc, expresionXpath);
         int total = items.size();
         recibido.setTamSecuencia(total);
+        recibido.setSequenceId(UUID.randomUUID().toString());
 
         Message mensajeOriginal = recibido.clonar();
         
-        arbolInstancia.agregarArbol(recibido.getComandaId(), comanda, items);
-        int contador = 0;
+        arbolInstancia.agregarArbol(recibido.getSequenceId(), doc, items);
+        int contador = 1;
 
         for (Node item : items) {
             Message nuevoMensaje = mensajeOriginal.clonar();

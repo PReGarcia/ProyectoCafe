@@ -1,16 +1,20 @@
 package utils;
 
+import java.util.UUID;
+
 import org.w3c.dom.Document;
 
 public class Message {
-    private String comandaId;
+    private String messageId;
+    private String sequenceId;
     private String correlationId;
     private int tamSecuencia;
     private int ordenSecuencia;
     private Document cuerpo;
 
-    public Message(String cid, String corrId, int tamSec, int ordSec, Document c){
-        comandaId = cid;
+    public Message(String sequenceId, String corrId, int tamSec, int ordSec, Document c){
+        messageId = UUID.randomUUID().toString();
+        this.sequenceId = sequenceId;
         correlationId = corrId;
         tamSecuencia = tamSec;
         ordenSecuencia = ordSec;
@@ -18,14 +22,28 @@ public class Message {
     }
 
     public Message(String cid, Document c){
-        comandaId = cid;
+        messageId = UUID.randomUUID().toString();
+        sequenceId = null;
         tamSecuencia = 0;
         ordenSecuencia = 0;
         cuerpo = c;
     }
 
-    public String getComandaId() {
-        return comandaId;
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    public String getSequenceId() {
+        return sequenceId;
+    }
+
+    public void setSequenceId(String sequenceId) {
+        this.sequenceId = sequenceId;
     }
 
     public int getTamSecuencia() {
@@ -42,10 +60,6 @@ public class Message {
 
     public void setOrdenSecuencia(int ordenSecuencia) {
         this.ordenSecuencia = ordenSecuencia;
-    }
-
-    public void setComandaId(String comandaId) {
-        this.comandaId = comandaId;
     }
 
     public String getCorrelationId() {
@@ -65,7 +79,7 @@ public class Message {
     }
 
     public Message clonar(){
-        return new Message(comandaId, correlationId, tamSecuencia, ordenSecuencia, cuerpo);
+        return new Message(sequenceId,correlationId, tamSecuencia, ordenSecuencia, cuerpo);
     }
 
 }
